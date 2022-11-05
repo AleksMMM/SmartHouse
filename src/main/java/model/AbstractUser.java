@@ -42,7 +42,7 @@ public abstract class AbstractUser {
         return abstractSmartHouses;
     }
 
-    public void setAbstractSmartHouses(AbstractSmartHouse abstractSmartHouse) {
-        this.abstractSmartHouses.add(abstractSmartHouse);
+    public void addAbstractSmartHouse(AbstractSmartHouse abstractSmartHouse) {
+        abstractSmartHouses.add(abstractSmartHouse);
     }
 }

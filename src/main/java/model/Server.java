@@ -1,5 +1,6 @@
 package model;
 
+import model.exeption.NotSupportedOperation;
 import model.exeption.ObjectExistException;
 import model.exeption.TypeException;
 import model.factory.HomeFactory;
@@ -22,7 +23,7 @@ public class Server {
 
     public static Server getInstance() {
         if (server != null) {
-          return server;
+            return server;
         }
 
         server = new Server();
@@ -36,31 +37,56 @@ public class Server {
 
             throw new ObjectExistException("Server side, this user is exist" + name);
         }
-     }
+    }
 
-     public void registerNewSmartHouse(String model, String name) throws Exception {
+    public boolean registerNewSmartHouse(String model, String name, String login, String password) throws Exception {
 
-        var home = HomeFactory.createNewHouse(name, model);
+        User user = hasUserAccess(login, password);
 
-        if (!smartHouses.containsKey(home.getId())) {
 
-            smartHouses.put(home.getId(), home);
 
-        } else {
+            if (user != null) {
+                var home = HomeFactory.createNewHouse(name, model);
 
-            throw new ObjectExistException("Server side, this user is exist" + name);
+                if (!smartHouses.containsKey(home.getId())) {
+
+                    smartHouses.put(home.getId(), home);
+
+                } else {
+
+                    throw new ObjectExistException("Server side, this house is exist" + name);
+                }
+
+                user.addAbstractSmartHouse(home);
+                home.addAdminToSmartHouse(user);
+
+            }
+
+        return false;
+    }
+
+    public User hasUserAccess(String login, String password) throws NotSupportedOperation {
+
+        User user = null;
+
+        if (users.containsKey(login)) {
+            if (users.get(login) instanceof RobotUser) {
+
+                throw new NotSupportedOperation("this operation not supported this user Robot");
+
+            }
+
+            user = (User) users.get(login);
+
+            if (user.getPassword().equals(password)) {
+                return user;
+            }
+
         }
-     }
+        return null;
+    }
 
-     public void addHumanSmartHouse(User user, AbstractSmartHouse sh) throws ObjectExistException {
+    public void addUserHouse(String login, String password, Long id, String role, String loginAddUser) {
 
-        if (!user.getAbstractSmartHouses().contains(sh)) {
-
-            user.setAbstractSmartHouses(sh);
-        } else {
-            throw new ObjectExistException(String.format("this smarthouse add this user ", sh.getName()));
-        }
-
-
-     }
+    }
 }
